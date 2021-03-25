@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import { defineComponent, h, nextTick, onMounted, ref, warn, watch } from "vue";
-import useSize from "./hooks/useSize";
 import Canvas from "./utils/Canvas";
 import Tools from "./components/Tools.vue";
 
@@ -19,17 +18,11 @@ export default defineComponent({
   setup() {
     const canvasEl = ref<HTMLCanvasElement | null>(null);
     const canvas = ref<Canvas | null>(null);
-    const { width, height } = useSize(document.body);
     onMounted(() => {
-      canvas.value = new Canvas(canvasEl.value!, {
-        width: width.value,
-        height: height.value,
-      });
+      canvas.value = new Canvas(canvasEl.value!);
     });
     return {
       canvasEl,
-      width,
-      height,
       canvas,
     };
   },
