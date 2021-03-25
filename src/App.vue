@@ -1,11 +1,6 @@
 <template>
   <div class="h-screen w-full overflow-hidden select-none relative">
-    <canvas
-      ref="canvasEl"
-      :width="width"
-      :height="height"
-      style="cursor: crosshair"
-    ></canvas>
+    <canvas ref="canvasEl" style="cursor: crosshair"></canvas>
     <Tools :canvas="canvas" />
   </div>
 </template>
@@ -23,10 +18,13 @@ export default defineComponent({
   },
   setup() {
     const canvasEl = ref<HTMLCanvasElement | null>(null);
-    const { width, height } = useSize(document.body);
     const canvas = ref<Canvas | null>(null);
+    const { width, height } = useSize(document.body);
     onMounted(() => {
-      canvas.value = new Canvas(canvasEl.value!);
+      canvas.value = new Canvas(canvasEl.value!, {
+        width: width.value,
+        height: height.value,
+      });
     });
     return {
       canvasEl,

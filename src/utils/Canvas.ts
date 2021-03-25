@@ -6,48 +6,46 @@ interface Point {
 // 绘图类型 笔画|移除
 export type PaintType = 'paint' | 'remove'
 
+interface Options {
+  background?: string
+  width?: number
+  height?: number
+}
+
 export default class Canvas {
   color: string = 'black'; // 笔颜色
-  width: number = 10;// 笔宽度
+  width: number = 20;// 笔宽度
+  removeWidth: number = 20;// 橡皮宽度
   background: string = 'white'; // 编辑
   ctx: CanvasRenderingContext2D; // ctx
   canvasElement: HTMLCanvasElement; // el
   history: ImageData[] = []; //历史
-  historyData: ImageData | undefined; //历史数据
+  step: number = -10; //步骤 
   paintType: PaintType = 'paint'; // 绘图类型 笔画|移除
   canvasWidth = 0
   canvasHeight = 0
-  constructor(canvasElement: HTMLCanvasElement, background?: string) {
+  constructor(canvasElement: HTMLCanvasElement, options: Options = {}) {
+    canvasElement.width = options.width || document.body.offsetWidth
+    canvasElement.height = options.height || document.body.offsetHeight
     this.canvasElement = canvasElement;
-    setTimeout(()=>{
-      this.canvasWidth = canvasElement.width;
-      this.canvasHeight = canvasElement.height;
-    })
+    this.canvasWidth = canvasElement.width;
+    this.canvasHeight = canvasElement.height;
     this.ctx = canvasElement.getContext('2d')!;
-    if (background) {
-      this.background = background
-      this.ctx.fillStyle = this.background
-      this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+    if (options.background) {
+      this.background = options.background
     }
-    // this.ctx.fillStyle = this.color
-    this.ctx.fillStyle = 'orange'
+    this.ctx.fillStyle = this.background
+    this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+    this.ctx.fillStyle = this.color
     this.ctx.lineCap = "round"
     this.ctx.lineJoin = "round"
-    this.paint() // 默认画笔
+    this.ctx.lineWidth = this.width
+    this.init() // 默认画笔
+    this.saveHistory()
   }
-  // 画笔
-  private paint() {
+  private init() {
     this.canvasElement.onmousedown = (e: MouseEvent) => {
-      try {
-        // TODO
-        const current = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
-        console.log(current);
-        this.saveHistory(current)
-      } catch (error) {
-        console.error(error);
-      }
       let start: Point = { x: e.clientX, y: e.clientY }
-      this.ctx.save()
       this.drawCircle(start.x, start.y, 0)
       this.canvasElement.onmousemove = (e: MouseEvent) => {
         const current: Point = { x: e.clientX, y: e.clientY }
@@ -57,11 +55,25 @@ export default class Canvas {
     }
     this.canvasElement.onmouseup = () => {
       this.canvasElement.onmousemove = null
+      this.saveHistory()
     }
   }
 
+  //paint
+  paint() {
+    this.paintType = 'paint'
+    this.ctx.lineWidth = this.width
+  }
+  // 清空画布
   clear() {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.history=[]
+  }
+
+  // 橡皮
+  remove() {
+    this.paintType = 'remove'
+    this.ctx.lineWidth = this.removeWidth
   }
 
   private drawCircle(x: number, y: number, radius: number) {
@@ -98,13 +110,55 @@ export default class Canvas {
   }
 
   // 历史
-  private saveHistory(data: ImageData) {
-    if (this.history.length > 10) {
+  private saveHistory() {
+    const current = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
+    // 最多存20步
+    if (this.history.length > 20) {
       this.history.shift()
+      if (this.step !== -10) {
+        this.step += 1
+        if (this.step > this.history.length - 1) {
+          this.step = this.history.length - 1
+        }
+      }
     }
-    this.history.push(data)
+    this.history.push(current)
+    this.ctx.save()
   }
 
+  // 撤回
+  undo() {
+    if (this.history.length > 0) {
+      if (this.step === -10) {
+        this.step = this.history.length - 1
+      }
+      if (this.step <= -1) {
+        return
+      }
+      this.step--
+      const data = this.history[this.step]
+      if (data) {
+        this.ctx.putImageData(data, 0, 0)
+      }
+    }
+  }
+  // 恢复
+  redo() {
+    if (this.history.length > 0) {
+      if (this.step === -10) {
+        this.step = this.history.length - 1
+      }
+      if (this.step >= this.history.length - 1) {
+        return
+      }
+      this.step++
+      const data = this.history[this.step]
+      console.log(data);
+      if (data) {
+        this.ctx.putImageData(data, 0, 0)
+      }
+    }
+  }
   //  保存图片
   save() {
     const imgUrl = this.canvasElement.toDataURL("image/png");
@@ -119,8 +173,10 @@ export default class Canvas {
   setWidth(width: number) {
     this.width = width
     this.ctx.lineWidth = width
-    console.log(width);
-
+  }
+  setRemoveWidth(removeWidth: number) {
+    this.removeWidth = removeWidth
+    // this.ctx.lineWidth = width
   }
   setColor(color: string) {
     console.log(color);
