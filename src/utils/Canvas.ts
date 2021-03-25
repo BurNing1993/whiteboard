@@ -44,18 +44,37 @@ export default class Canvas {
     this.saveHistory()
   }
   private init() {
-    this.canvasElement.onmousedown = (e: MouseEvent) => {
-      let start: Point = { x: e.clientX, y: e.clientY }
-      this.drawCircle(start.x, start.y, 0)
-      this.canvasElement.onmousemove = (e: MouseEvent) => {
-        const current: Point = { x: e.clientX, y: e.clientY }
-        this.drawLine(start.x, start.y, current.x, current.y)
-        start = current
+    // Mobile
+    if (document.body.ontouchstart !== undefined) {
+      this.canvasElement.ontouchstart = (e: TouchEvent) => {
+        console.log(e);
+        let start: Point = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+        this.drawCircle(start.x, start.y, 0)
+        this.canvasElement.ontouchmove = (e: TouchEvent) => {
+          const current: Point = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+          this.drawLine(start.x, start.y, current.x, current.y)
+          start = current
+        }
       }
-    }
-    this.canvasElement.onmouseup = () => {
-      this.canvasElement.onmousemove = null
-      this.saveHistory()
+      this.canvasElement.ontouchend = () => {
+        this.canvasElement.ontouchmove = null
+        this.saveHistory()
+      }
+      // PC
+    } else {
+      this.canvasElement.onmousedown = (e: MouseEvent) => {
+        let start: Point = { x: e.clientX, y: e.clientY }
+        this.drawCircle(start.x, start.y, 0)
+        this.canvasElement.onmousemove = (e: MouseEvent) => {
+          const current: Point = { x: e.clientX, y: e.clientY }
+          this.drawLine(start.x, start.y, current.x, current.y)
+          start = current
+        }
+      }
+      this.canvasElement.onmouseup = () => {
+        this.canvasElement.onmousemove = null
+        this.saveHistory()
+      }
     }
   }
 
@@ -67,7 +86,8 @@ export default class Canvas {
   // 清空画布
   clear() {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.history=[]
+    this.history = []
+    this.saveHistory()
   }
 
   // 橡皮

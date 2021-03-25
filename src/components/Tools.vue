@@ -1,6 +1,6 @@
 <template>
   <section class="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-    <div class="flex">
+    <div class="flex flex-wrap">
       <el-popover placement="top" width="400" trigger="click">
         <template #reference>
           <div

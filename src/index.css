@@ -3,6 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.active {
-  box-shadow: 0 0 15px #00ccff;
+
+.el-message-box{
+  max-width: 200px;
 }
