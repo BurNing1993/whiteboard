@@ -20,7 +20,7 @@ export default class Canvas {
   ctx: CanvasRenderingContext2D; // ctx
   canvasElement: HTMLCanvasElement; // el
   history: ImageData[] = []; //历史
-  step: number = -10; //步骤 
+  step: number = -10; //步骤
   paintType: PaintType = 'paint'; // 绘图类型 笔画|移除
   canvasWidth = 0
   canvasHeight = 0
@@ -182,7 +182,7 @@ export default class Canvas {
   //  保存图片
   save() {
     const imgUrl = this.canvasElement.toDataURL("image/png");
-    let saveA = document.createElement("a");
+    const saveA = document.createElement('a')
     document.body.appendChild(saveA);
     saveA.href = imgUrl;
     saveA.download = "wb" + Date.now();

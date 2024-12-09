@@ -1,28 +1,39 @@
 {
   "name": "whiteboard",
-  "version": "0.0.1",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vuedx-typecheck . && vite build",
-    "serve": "vite preview"
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/"
   },
   "dependencies": {
-    "@icon-park/vue-next": "^1.3.1",
-    "element-plus": "^1.0.2-beta.33",
-    "lodash-es": "^4.17.21",
-    "vue": "^3.0.5"
+    "element-plus": "^2.9.0",
+    "lucide-vue-next": "^0.468.0",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.4",
-    "@vitejs/plugin-vue": "^1.1.2",
-    "@vue/compiler-sfc": "^3.0.5",
-    "@vuedx/typecheck": "^0.6.0",
-    "@vuedx/typescript-plugin-vue": "^0.6.0",
-    "autoprefixer": "^10.2.5",
-    "postcss": "^8.2.8",
-    "tailwindcss": "^2.0.3",
-    "typescript": "^4.1.3",
-    "vite": "^2.0.5",
-    "vite-plugin-style-import": "^0.9.1"
+    "@tsconfig/node22": "^22.0.0",
+    "@types/node": "^22.9.3",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/eslint-config-prettier": "^10.1.0",
+    "@vue/eslint-config-typescript": "^14.1.3",
+    "@vue/tsconfig": "^0.7.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.14.0",
+    "eslint-plugin-vue": "^9.30.0",
+    "npm-run-all2": "^7.0.1",
+    "postcss": "^8.4.49",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.16",
+    "typescript": "~5.6.3",
+    "vite": "^6.0.1",
+    "vite-plugin-vue-devtools": "^7.6.5",
+    "vue-tsc": "^2.1.10"
   }
 }
